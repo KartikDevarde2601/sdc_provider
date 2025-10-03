@@ -1,0 +1,13 @@
+# SDC Medical Device Monitor - Dependencies
+
+# Core SDC library
+sdc11073>=2.0.0
+
+# UI Framework
+nicegui>=1.4.0
+
+# Data handling
+plotly>=5.14.0
+
+# Optional but recommended
+python-dotenv>=1.0.0  # For environment configuration
