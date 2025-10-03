@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<msg:GetMdibResponse
+    xmlns:ext="http://standards.ieee.org/downloads/11073/11073-10207-2017/extension"
+    xmlns:msg="http://standards.ieee.org/downloads/11073/11073-10207-2017/message"
+    xmlns:pm="http://standards.ieee.org/downloads/11073/11073-10207-2017/participant"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    SequenceId="urn:oid:1">
+    <msg:Mdib SequenceId="urn:oid:1">
+        <pm:MdDescription>
+            <pm:Mds Handle="mds0" SafetyClassification="MedA">
+                <pm:Type Code="70001">
+                    <pm:ConceptDescription Lang="en-US">Simple Patient Monitor</pm:ConceptDescription>
+                </pm:Type>
+
+                <pm:SystemContext Handle="SC.mds0">
+                    <pm:PatientContext Handle="PC.mds0" />
+                    <pm:LocationContext Handle="LC.mds0" />
+                </pm:SystemContext>
+                <pm:Vmd Handle="vmd0" SafetyClassification="MedA">
+                    <pm:Type Code="130536">
+                        <pm:ConceptDescription Lang="en-US">Vital Signs Monitoring</pm:ConceptDescription>
+                    </pm:Type>
+
+                    <pm:Channel Handle="ch0.vmd0" SafetyClassification="MedA">
+                        <pm:Type Code="130637">
+                            <pm:ConceptDescription Lang="en-US">Physiological Measurements</pm:ConceptDescription>
+                        </pm:Type>
+
+                        <pm:Metric Handle="metric.spo2"
+                            SafetyClassification="MedA" xsi:type="pm:NumericMetricDescriptor"
+                            MetricCategory="Msrmt" MetricAvailability="Cont" Resolution="1">
+                            <pm:Type Code="150456">
+                                <pm:ConceptDescription Lang="en-US">MDC_PULS_OXIM_SAT_O2</pm:ConceptDescription>
+                            </pm:Type>
+                            <pm:Unit Code="262688">
+                                <pm:ConceptDescription Lang="en-US">%</pm:ConceptDescription>
+                            </pm:Unit>
+                            <pm:TechnicalRange Upper="100" Lower="0" StepWidth="1" />
+                        </pm:Metric>
+
+                        <pm:Metric Handle="metric.hr"
+                            SafetyClassification="MedA" xsi:type="pm:NumericMetricDescriptor"
+                            MetricCategory="Msrmt" MetricAvailability="Cont" Resolution="1">
+                            <pm:Type Code="147842">
+                                <pm:ConceptDescription Lang="en-US">MDC_ECG_HEART_RATE</pm:ConceptDescription>
+                            </pm:Type>
+                            <pm:Unit Code="262704">
+                                <pm:ConceptDescription Lang="en-US">bpm</pm:ConceptDescription>
+                            </pm:Unit>
+                            <pm:TechnicalRange Upper="300" Lower="0" StepWidth="1" />
+                        </pm:Metric>
+
+                        <pm:Metric Handle="metric.temp"
+                            SafetyClassification="MedA" xsi:type="pm:NumericMetricDescriptor"
+                            MetricCategory="Msrmt" MetricAvailability="Cont" Resolution="0.1">
+                            <pm:Type Code="150332">
+                                <pm:ConceptDescription Lang="en-US">MDC_TEMP_BODY</pm:ConceptDescription>
+                            </pm:Type>
+                            <pm:Unit Code="263872">
+                                <pm:ConceptDescription Lang="en-US">°C</pm:ConceptDescription>
+                            </pm:Unit>
+                            <pm:TechnicalRange Upper="50" Lower="20" StepWidth="0.1" />
+                        </pm:Metric>
+                    </pm:Channel>
+                </pm:Vmd>
+            </pm:Mds>
+        </pm:MdDescription>
+    </msg:Mdib>
+</msg:GetMdibResponse>

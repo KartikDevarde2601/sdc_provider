@@ -1,0 +1,5 @@
+# SDC Medical Device Monitor - Dependencies
+
+
+# Core SDC library
+sdc11073>=2.0.0
