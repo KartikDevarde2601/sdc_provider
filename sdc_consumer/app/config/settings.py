@@ -6,7 +6,7 @@ class Settings:
     """Central configuration for the SDC Monitor application."""
 
     # Network Configuration
-    DISCOVERY_ADDRESS = "10.239.42.255"
+    DISCOVERY_ADDRESS = "172.28.67.255"
     DISCOVERY_TIMEOUT = 10  # seconds
 
     # Device Configuration

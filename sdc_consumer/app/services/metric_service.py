@@ -49,9 +49,14 @@ class MetricService:
                     logger.warning(f"No descriptor found for metric {handle}")
                     continue
 
-                unit = descriptor.Unit.Code if hasattr(
-                    descriptor, 'Unit') else ""
-                name = settings.METRIC_NAMES.get(handle, handle)
+                # Get unit
+                unit = ""
+                if hasattr(descriptor, 'Unit') and descriptor.Unit:
+                    unit = descriptor.Unit.Code if hasattr(
+                        descriptor.Unit, 'Code') else str(descriptor.Unit)
+
+                # Get name - try multiple sources
+                name = self._get_metric_name(handle, descriptor)
 
                 # Create metric data object
                 metric_data = MetricData(
@@ -72,6 +77,26 @@ class MetricService:
         # Notify callbacks
         if updated_metrics:
             self._notify_callbacks(updated_metrics)
+
+    def _get_metric_name(self, handle: str, descriptor) -> str:
+        """Extract metric name from various sources."""
+        from config.settings import settings
+
+        # Check settings for custom name
+        if handle in settings.METRIC_NAMES:
+            return settings.METRIC_NAMES[handle]
+
+        # Try to get from descriptor Type
+        if hasattr(descriptor, 'Type') and descriptor.Type:
+            if hasattr(descriptor.Type, 'Code'):
+                code = descriptor.Type.Code
+                # Convert MDC code to readable name
+                name = code.replace('MDC_', '').replace('_', ' ').title()
+                return name
+
+        # Fall back to handle
+        name = handle.replace('metric.', '').replace('_', ' ').title()
+        return name
 
     def _add_to_history(self, metric_data: MetricData):
         """Add metric data to history, maintaining max_points limit."""

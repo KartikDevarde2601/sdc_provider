@@ -116,12 +116,14 @@ class MainView:
                 with ui.column().classes('flex-grow'):
                     ui.label(device.get_display_name()).classes(
                         'text-xl font-semibold')
+
+                    with ui.row().classes('w-full justify-start gap-10'):
+                        ui.label(f'Facility: {device.location.facility}')
+                        ui.label(f'Room: {device.location.poc}')
+                        ui.label(f'Bed: {device.location.bed}')
+
                     ui.label(f'EPR: {device.epr}').classes(
                         'text-sm text-gray-500')
-                    if device.ip_address:
-                        ui.label(f'IP: {device.ip_address}').classes(
-                            'text-sm text-gray-500')
-
                 # Status badge
                 self._create_status_badge(device.status)
 

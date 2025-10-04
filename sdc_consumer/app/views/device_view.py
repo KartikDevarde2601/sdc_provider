@@ -2,8 +2,7 @@
 import logging
 from nicegui import ui
 from typing import Callable, Dict
-from models.device import Device
-from models.metric import MetricData
+from models.device import Device, MetricData
 from views.components.vital_display import VitalDisplay
 from views.components.metric_chart import MetricChart
 
@@ -28,9 +27,10 @@ class DeviceView:
 
     def render(self):
         """Render the device monitoring view."""
-        with ui.column().classes('w-full h-screen p-6 bg-gray-50'):
-            # Header
-            with ui.card().classes('w-full mb-4'):
+        # Fixed container to prevent layout shifts
+        with ui.column().classes('w-full min-h-screen p-6 bg-gray-50').style('max-width: 100vw; overflow-x: hidden;'):
+            # Header - fixed height
+            with ui.card().classes('w-full mb-4').style('min-height: 80px;'):
                 with ui.row().classes('w-full items-center'):
                     ui.button(
                         icon='arrow_back',
@@ -47,10 +47,10 @@ class DeviceView:
                         'px-4 py-2 rounded-full bg-green-200 text-green-800 font-semibold'
                     )
 
-            # Main content area
-            with ui.row().classes('w-full gap-4 flex-grow'):
-                # Left column - Vital signs
-                with ui.column().classes('w-1/3 gap-4'):
+            # Main content area - fixed structure
+            with ui.row().classes('w-full gap-4') .style('min-height: calc(100vh - 180px);'):
+                # Left column - Vital signs (fixed width)
+                with ui.column().classes('gap-4').style('width: 400px; min-width: 400px;'):
                     ui.label('Current Vitals').classes(
                         'text-xl font-semibold mb-2')
 
@@ -81,8 +81,8 @@ class DeviceView:
                     )
                     self.vital_displays['metric.temp'].render()
 
-                # Right column - Charts
-                with ui.column().classes('flex-grow gap-4'):
+                # Right column - Charts (flexible width)
+                with ui.column().classes('flex-grow gap-4').style('min-width: 600px;'):
                     ui.label(
                         'Real-Time Trends').classes('text-xl font-semibold mb-2')
 

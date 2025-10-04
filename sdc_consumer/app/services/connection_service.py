@@ -40,6 +40,13 @@ class ConnectionService:
             self.mdib = ConsumerMdib(self.consumer)
             self.mdib.init_mdib()
 
+            # Store in device object for easy access
+            self.device.client = self.consumer
+            self.device.mdib = self.mdib
+
+            # Populate device information from DPWS and MDIB
+            self._populate_device_info()
+
             self.device.status = DeviceStatus.CONNECTED
             logger.info(f"Successfully connected to {self.device.epr}")
 
@@ -47,6 +54,93 @@ class ConnectionService:
             self.device.status = DeviceStatus.ERROR
             logger.error(f"Failed to connect to {self.device.epr}: {e}")
             raise
+
+    def _populate_device_info(self):
+        """Extract and populate device information from DPWS and MDIB."""
+        try:
+            # Get DPWS Model Information
+            if hasattr(self.consumer, 'host_description') and self.consumer.host_description:
+                host_desc = self.consumer.host_description
+
+                # Model Information
+                if hasattr(host_desc, 'this_model') and host_desc.this_model:
+                    model = host_desc.this_model
+                    self.device.manufacturer = self._get_text(
+                        getattr(model, 'Manufacturer', None))
+                    self.device.manufacturer_url = getattr(
+                        model, 'ManufacturerUrl', None)
+                    self.device.model_name = self._get_text(
+                        getattr(model, 'ModelName', None))
+                    self.device.model_number = getattr(
+                        model, 'ModelNumber', None)
+                    self.device.model_url = getattr(model, 'ModelUrl', None)
+                    self.device.presentation_url = getattr(
+                        model, 'PresentationUrl', None)
+
+                # Device Information
+                if hasattr(host_desc, 'this_device') and host_desc.this_device:
+                    device_info = host_desc.this_device
+                    self.device.friendly_name = self._get_text(
+                        getattr(device_info, 'FriendlyName', None))
+                    self.device.firmware_version = getattr(
+                        device_info, 'FirmwareVersion', None)
+                    self.device.serial_number = getattr(
+                        device_info, 'SerialNumber', None)
+
+            # Get Location from MDIB if not already set
+            if self.device.location is None or not any([
+                self.device.location.facility,
+                self.device.location.poc,
+                self.device.location.bed
+            ]):
+                self._populate_location_from_mdib()
+
+            logger.info(
+                f"Device info populated: {self.device.get_display_name()}")
+
+        except Exception as e:
+            logger.warning(f"Could not fully populate device info: {e}")
+
+    def _populate_location_from_mdib(self):
+        """Extract location information from MDIB context states."""
+        try:
+            from sdc11073.xml_types import pm_qnames as pm
+            from sdc11073.xml_types import pm_types
+            from models.device import LocationInfo
+
+            location_contexts = self.mdib.context_states.NODETYPE.get(
+                pm.LocationContextState, [])
+
+            for loc in location_contexts:
+                if loc.ContextAssociation == pm_types.ContextAssociation.ASSOCIATED:
+                    if loc.LocationDetail:
+                        detail = loc.LocationDetail
+                        self.device.location = LocationInfo(
+                            facility=getattr(detail, 'Facility', None),
+                            poc=getattr(detail, 'PoC', None),
+                            bed=getattr(detail, 'Bed', None),
+                            room=getattr(detail, 'Room', None),
+                            building=getattr(detail, 'Building', None),
+                            floor=getattr(detail, 'Floor', None)
+                        )
+                        logger.info(
+                            f"Location populated from MDIB: {self.device.location}")
+                        break
+
+        except Exception as e:
+            logger.debug(f"Could not extract location from MDIB: {e}")
+
+    def _get_text(self, value):
+        """Extract text from LocalizedStringType or return value as-is."""
+        if value is None:
+            return None
+        if isinstance(value, list) and len(value) > 0:
+            first_item = value[0]
+            if hasattr(first_item, 'text'):
+                return first_item.text
+        elif hasattr(value, 'text'):
+            return value.text
+        return str(value) if value else None
 
     def disconnect(self):
         """Disconnect from the device."""

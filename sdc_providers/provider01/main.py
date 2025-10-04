@@ -17,14 +17,14 @@ from sdc11073.xml_types.dpws_types import ThisDeviceType
 from sdc11073.xml_types.dpws_types import ThisModelType
 
 base_uuid = uuid.UUID('{cc013678-79f6-403c-998f-3cc0cc050230}')
-my_uuid = uuid.uuid5(base_uuid, "PatientDevice02")
+my_uuid = uuid.uuid5(base_uuid, "00001")
 
 
 if __name__ == '__main__':
 
     basic_logging_setup(level=logging.INFO)
 
-    my_discovery = WSDiscoverySingleAdapter("wlan0")
+    my_discovery = WSDiscoverySingleAdapter("en0")
     my_discovery.start()
 
     my_mdib = ProviderMdib.from_mdib_file("mdib.xml")
